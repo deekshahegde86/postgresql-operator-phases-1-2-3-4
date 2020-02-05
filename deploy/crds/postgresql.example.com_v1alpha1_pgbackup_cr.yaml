@@ -1,0 +1,14 @@
+apiVersion: postgresql.example.com/v1alpha1
+kind: PgBackup
+metadata:
+  name: example-pgbackup
+spec:
+  image: applicadb/postgres-python 
+  serviceIp: 10.104.76.42
+  dbName: books;students;employes
+  postgresDb: postgresdb
+  postgresUser: postgresadmin
+  postgresPassword: admin123
+  backupFile: data.sql
+  bucketName: anil123anil123
+  schedule: "*/8 * * * * "

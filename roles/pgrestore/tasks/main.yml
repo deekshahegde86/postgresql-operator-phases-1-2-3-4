@@ -1,0 +1,49 @@
+---
+- name: restore postgres
+  k8s:
+    definition:
+      kind: Deployment
+      apiVersion: apps/v1
+      metadata:
+        name: 'restore-postgres'
+        namespace: '{{ meta.namespace }}'
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: postgres
+        template:
+          metadata:
+            labels:
+              app: postgres
+          spec:
+            restartPolicy: Never
+            containers:
+            - name: postgres
+              image: applicadb/postgres-python
+              ports:
+              - containerPort: 5432
+              env:
+                - name: SERVICE_IP
+                  value: "{{ service_ip }}"
+                - name: BACKUPDB_NAMES
+                  value: "{{ db_name }}"
+                - name: POSTGRES_DB
+                  value: "{{ postgres_db }}"
+                - name: POSTGRES_USER
+                  value: "{{ postgres_user }}"
+                - name: POSTGRES_PASSWORD
+                  value: "{{ postgres_password }}"
+              envFrom:
+                - configMapRef:
+                    name: pgrestore-cm
+              volumeMounts:
+              - name: postgresql-data
+                mountPath: "/var/lib/postgresql/data"
+              command: ["/bin/sh","-c"]
+              args: ["apt-get update && apt-get install -y wget && pip install ibm-cos-sdk && wget https://raw.githubusercontent.com/deekshahegde86/postgresql-operator-phases-1-2-3/master/scripts/restore/restore-db-backup.sh && bash restore-db-backup.sh "]
+            volumes:
+            - name: postgresql-data
+              persistentVolumeClaim:
+                claimName: postgresql-pvc-vol22
+

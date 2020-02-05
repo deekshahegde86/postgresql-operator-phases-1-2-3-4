@@ -1,0 +1,15 @@
+---
+- version: v1alpha1
+  group: postgresql.example.com
+  kind: Postgresql
+  role: /opt/ansible/roles/postgresql
+
+- version: v1alpha1
+  group: postgresql.example.com
+  kind: PgBackup
+  role: /opt/ansible/roles/pgbackup
+
+- version: v1alpha1
+  group: postgresql.example.com
+  kind: PgRestore
+  role: /opt/ansible/roles/pgrestore

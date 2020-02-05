@@ -1,0 +1,46 @@
+---
+- name: start pgbackup cron job
+  k8s:
+    definition:
+      apiVersion: batch/v1beta1
+      kind: CronJob
+      metadata:
+        name: '{{ meta.name }}-cronjob-pgbackup'
+        namespace: '{{ meta.namespace }}'
+      spec:
+        replias: 1
+        schedule: "{{ schedule }}"
+        jobTemplate:
+          spec:
+            template:
+              spec:
+                restartPolicy: Never
+                containers:
+                  - name: postgres-backup
+                    image: "{{ image }}"
+                    imagePullPolicy: "IfNotPresent"
+                    ports:
+                      - containerPort: 5432
+                    env:
+                      - name: SERVICE_IP
+                        value: "{{ service_ip }}"
+                      - name: DB_NAMES
+                        value: "{{ db_name }}"
+                      - name: POSTGRES_DB
+                        value: "{{ postgres_db }}"
+                      - name: POSTGRES_USER
+                        value: "{{ postgres_user }}"
+                      - name: POSTGRES_PASSWORD
+                        value: "{{ postgres_password }}"
+                    envFrom:
+                      - configMapRef:
+                          name: pgbackup-cm
+                    volumeMounts:
+                    - name: postgresql-data
+                      mountPath: "/var/lib/postgresql/data"
+                    command: ["/bin/sh","-c"]
+                    args: ["apt-get update && apt-get install -y wget && pip install ibm-cos-sdk && wget https://raw.githubusercontent.com/deekshahegde86/postgresql-operator-phases-1-2-3/master/scripts/backup/backup-db.sh && bash backup-db.sh "]
+                volumes:
+                - name: postgresql-data
+                  persistentVolumeClaim:
+                    claimName: postgresql-pvc-vol22

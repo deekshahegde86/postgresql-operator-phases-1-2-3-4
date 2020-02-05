@@ -1,0 +1,33 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: postgresql-pv-vol22
+  namespace: psql
+  labels:
+    type: local
+    app: postgresql
+spec:
+  storageClassName: local-storage
+  capacity:
+     storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgresql-pvc-vol22
+  namespace: psql
+  labels:
+    type: local
+    app: postgresql
+spec:
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteMany

@@ -1,0 +1,14 @@
+apiVersion: postgresql.example.com/v1alpha1
+kind: PgRestore
+metadata:
+  name: example-pgrestore
+spec:
+  image: applicadb/postgres-python
+  serviceIp: 10.103.56.125
+  dbName: books-01-02-2020.sql;
+  postgresDb: postgresdb
+  postgresUser: postgresadmin
+  postgresPassword: admin123
+  backupFile: data.sql
+
+
